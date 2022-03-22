@@ -1,155 +1,149 @@
-# Kiwi Browser
+# 猕猴桃浏览器
 
-![automatic build of apk](https://github.com/kiwibrowser/src/workflows/automatic%20build%20of%20apk/badge.svg)
+[![自动构建apk](https://github.com/kiwibrowser/src/workflows/automatic%20build%20of%20apk/badge.svg)
+## 概述
 
-## Overview
+[Kiwi Browser](https://kiwibrowser.com/)是一款完全开源的安卓网络浏览器。
 
-[Kiwi Browser](https://kiwibrowser.com/) is a fully open-source web browser for Android.
+Kiwi 基于 Chromium。轻松切换到 Kiwi，无需费力学习新界面或打破现有浏览习惯。
 
-Kiwi is based on Chromium. Easily switch to Kiwi without having to painstakingly learn a new interface or break your existing browsing habits.
+除其他功能外，Kiwi 浏览器还支持：
 
-Among other functionalities, Kiwi Browser supports:
+- 夜间模式（Chromium 之外的另一种实现）
+- 支持 Chrome 扩展
+- 底部地址栏 它还包括性能改进（瓷砖的部分光栅化等）
 
- - Night Mode (another implementation than Chromium)
- - Support for Chrome Extensions
- - Bottom address bar
-It also includes performance improvements (partial rasterization of tiles, etc)
+该浏览器的许可与 Chromium 相同，这意味着您可以创建浏览器的衍生产品。
 
-The browser is licensed under the same license as Chromium, which means that you are allowed to create derivatives of the browser.
+确保正确地将代码归因于此存储库（不要只替换为您的姓名）
 
-Make sure to properly attribute the code to this repository (don't just replace with your name)
+## 目录
 
-## Table of contents
+- [时间线](#timeline)
+- [贡献](#contributing)
+- [修改](#modifying)
+- [建筑](#building)
+  - [获取源代码和环境](#getting-the-source-code-and-environment)
+  - [设置依赖项](#setting-up-dependencies)
+  - [准备签名密钥](#preparing-a-signing-key)
+  - [配置构建类型和平台](#configuring-the-build-type-and-platform)
+  - [准备第一个构建](#preparing-the-first-build)
+  - [编译 Kiwi 浏览器](#compiling-kiwi-browser)
+  - [调查崩溃](#investigating-crashes)
+  - [远程调试](#remote-debugging)
+  - [优化二进制大小](#optimizing-binary-size)
+- [路线图](#roadmap)
+- [其他帮助](#additional-help)
 
-- [Timeline](#timeline)
-- [Contributing](#contributing)
-- [Modifying](#modifying)
-- [Building](#building)
-  - [Getting the source-code and environment](#getting-the-source-code-and-environment)
-  - [Setting-up dependencies](#setting-up-dependencies)
-  - [Preparing a signing key](#preparing-a-signing-key)
-  - [Configuring the build type and platform](#configuring-the-build-type-and-platform)
-  - [Preparing the first build](#preparing-the-first-build)
-  - [Compiling Kiwi Browser](#compiling-kiwi-browser)
-  - [Investigating crashes](#investigating-crashes)
-  - [Remote debugging](#remote-debugging)
-  - [Optimizing binary size](#optimizing-binary-size)
-- [Roadmap](#roadmap)
-- [Additional help](#additional-help)
+## 时间线
 
-## Timeline
+- 2018 年 4 月 15 日 - 首次发布 Kiwi 浏览器。
+- 2019 年 4 月 15 日 - Kiwi 浏览器获得对 Chrome 扩展的支持。
+- 2020 年 4 月 17 日 - Kiwi 浏览器完全开源。
 
-- 15 April 2018 - First Kiwi Browser release.
+此代码是最新的，并且与 Play 商店上的构建相匹配。
 
-- 15 April 2019 - Kiwi Browser gets support for Chrome Extensions.
+新版本是从开源版本直接到[Play Store](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser)完成的。
 
-- 17 April 2020 - Kiwi Browser goes fully open-source.
+此存储库中有数千小时的工作，并且更改了数千个文件。
 
+## 贡献
 
-This code is up-to-date and is matching the build on the Play Store.
+欢迎和鼓励贡献。
 
-The new builds are done from the open-source edition directly to the [Play Store](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser).
+如果您希望将您的代码集成到 Kiwi 中，请打开合并请求，我（和/或社区成员）可以与您一起审查代码并将其推送到 Play 商店。
 
-There are thousands of hours of work in this repository and thousands of files changed.
+## 修改
 
-## Contributing
+如果您创建自己的浏览器或模组，请确保更改浏览器名称和图标以及翻译字符串（在 all 、 all和 all文件`chrome/android/java/res_chromium/values/channel_constants.xml`中搜索和替换 Kiwi ）。更换应用程序图标时，请确保在各自的文件夹（mdpi、hdpi 等）中添加新图标文件，并更新 AndroidManifest.xml。`*.xtb``*.grd``*.grdp``chrome/android/java/res/mipmap`
 
-Contributions are welcome and encouraged.
+## 构建
 
-If you want your code to be integrated into Kiwi, open a merge request, I (and/or a member of the community) can review the code with you and push it to the Play Store.
+参考构建机器使用的是 Ubuntu 19.04（也使用 Ubuntu 18.04 和 Ubuntu 19.10 进行了测试）。
 
-## Modifying
+最低系统要求为 2 个 vCPU、7.5 GB 内存。
 
-If you create your own browser or a mod, make sure to change the browser name and icon in `chrome/android/java/res_chromium/values/channel_constants.xml` and translation strings (search and replace Kiwi in all `*.xtb`, all `*.grd` and all `*.grdp` files).
-When replacing the app icon, make sure to add the new icon files in their respective `chrome/android/java/res/mipmap` folders(mdpi, hdpi etc) and also update the AndroidManifest.xml.
+您可以使用虚拟机、AWS VM 或 Google Cloud VM。
 
-## Building
+### 获取源代码和环境
 
-The reference build machine is using Ubuntu 19.04 (also tested using Ubuntu 18.04 and Ubuntu 19.10).
+要构建 Kiwi Browser，您可以直接克隆存储库，因为我们已经打包了所有依赖项：
 
-The minimum system requirements are 2 vCPUs, 7.5 GB Memory.
-
-You can use a virtual machine, an AWS VM, or a Google Cloud VM.
-
-### Getting the source-code and environment
-
-To build Kiwi Browser you can directly clone the repository, as we have packed all dependencies already:
-
-In ~ (your home directory) run:
+在〜（您的主目录）中运行：
 
 ```
 git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 ```
 
-and edit the file ~/.bashrc to add at the very end
+并编辑文件 ~/.bashrc 在最后添加
 
-```bash
-export PATH=$HOME/depot_tools:$PATH
+```
+export PATH= $HOME /depot_tools: $PATH
 ```
 
-Validate the changes by running:
+通过运行验证更改：
 
-```bash
-source ~/.bashrc
+```
+source 〜/ .bashrc
 ```
 
-This will give you access to one utility called gclient (as in "Google client")
+这将使您可以访问一个名为 gclient 的实用程序（如“Google 客户端”）
 
-Create a directory called ~/chromium/, and in ~/chromium/ run:
+创建一个名为 ~/chromium/ 的目录，并在 ~/chromium/ 中运行：
 
-```bash
+```
 git clone https://github.com/kiwibrowser/dependencies.git .cipd
-cp ~/chromium/.cipd/.gclient ~/chromium/
-cp ~/chromium/.cipd/.gclient_entries ~/chromium/
+cp ~ /chromium/.cipd/.gclient ~ /chromium/
+cp ~ /chromium/.cipd/.gclient_entries ~ /chromium/
 git clone https://github.com/kiwibrowser/src.git
 ```
 
-At this stage, in ~/chromium/ you will have the .cipd folder, and a folder with the Kiwi Browser source-code called src.
+在这个阶段，在 ~/chromium/ 中，您将拥有 .cipd 文件夹，以及一个名为 src 的包含 Kiwi 浏览器源代码的文件夹。
 
-### Setting up dependencies
+### 设置依赖项
 
-To be able to build Kiwi Browser, you need python and OpenJDK (OpenJDK to create Java bindings for Android):
+为了能够构建 Kiwi 浏览器，您需要 python 和 OpenJDK（OpenJDK 为 Android 创建 Java 绑定）：
 
-```bash
+```
 sudo apt-get update
 sudo apt-get install python openjdk-8-jdk-headless libncurses5
 ```
 
-We want to be sure to use Java 1.8 in order to not get compilation errors (lint and errorprone):
+我们要确保使用 Java 1.8，以免出现编译错误（lint 和容易出错）：
 
-```bash
+```
 sudo update-java-alternatives --set java-1.8.0-openjdk-amd64
 ```
 
-then run the following commands in ~/chromium/src:
+然后在 ~/chromium/src 中运行以下命令：
 
-```bash
+```
 bash install-build-deps.sh --no-chromeos-fonts
 build/linux/sysroot_scripts/install-sysroot.py --arch=i386
 build/linux/sysroot_scripts/install-sysroot.py --arch=amd64
 ```
 
-These commands will install all necessary system packages using apt-get and gather a minimal build filesystem.
+这些命令将使用 apt-get 安装所有必要的系统包并收集最小的构建文件系统。
 
-### Preparing a signing key
+### 准备签名密钥
 
-APKs (application packages) on Android need to be signed by developers in order to be distributed.
+Android 上的 APK（应用程序包）需要开发者签名才能分发。
 
-To generate a key:
+要生成密钥：
 
-```bash
-keytool -genkey -v -keystore ~/chromium/keystore.jks -alias production -keyalg RSA -keysize 2048 -validity 10000 -storepass HERE_YOUR_ANDROID_KEYSTORE_PASSWORD -keypass HERE_YOUR_ANDROID_KEYSTORE_PASSWORD
+```
+keytool -genkey -v -keystore ~ /chromium/keystore.jks -alias production -keyalg RSA -keysize 2048 -validity 10000 -storepass HERE_YOUR_ANDROID_KEYSTORE_PASSWORD -keypass HERE_YOUR_ANDROID_KEYSTORE_PASSWORD
 ```
 
-### Configuring the build type and platform
+### 配置构建类型和平台
 
-Run:
+run：
 
-```bash
-mkdir -p ~/chromium/src/out/android_arm
+```
+mkdir -p ~ /chromium/src/out/android_arm
 ```
 
-Create a file called args.gn in ~/chromium/src/out/android_arm/ with this content:
+在 ~/chromium/src/out/android_arm/ 中创建一个名为 args.gn 的文件，其中包含以下内容：
 
 ```bash
 target_os = "android"
@@ -202,108 +196,111 @@ enable_extensions = true
 enable_plugins = true
 ```
 
-You can replace Android keystore password and Android keystore keypath with the data for your Android keystore (or you can generate a new key).
+您可以将 Android 密钥库密码和 Android 密钥库密钥路径替换为您的 Android 密钥库的数据（或者您可以生成一个新密钥）。
 
-### Preparing the first build
+### 准备第一个构建
 
-To prepare initial setup run from ~/chromium/src:
+要从 ~/chromium/src 准备初始设置运行：
 
 ```
 gclient runhooks
 ```
 
-then generate the build files in ~/chromium/src:
+然后在 ~/chromium/src 中生成构建文件：
 
 ```
 gn gen out/android_arm
 ```
 
-Alternatively you can use: gn args out/android_arm
+或者，您可以使用：gn args out/android_arm
 
-### Compiling Kiwi Browser
+### 编译 Kiwi 浏览器
 
-To compile, use the command:
+要编译，请使用以下命令：
 
 ```
 ninja -C out/android_arm chrome_public_apk
 ```
 
-you'll have the output APK in ~/chromium/src/out/android_arm/apks/ChromePublic.apk
+您将在 ~/chromium/src/out/android_arm/apks/ChromePublic.apk 中获得输出 APK
 
-then you can run the APK on your phone.
+然后您可以在手机上运行 APK。
 
-### Investigating crashes
+### 调查崩溃
 
-You need to have the symbols for the version that crashed, the symbols can be generated using:
+您需要有崩溃版本的符号，可以使用以下方法生成符号：
+
 ```
 components/crash/content/tools/generate_breakpad_symbols.py --build-dir=out/lnx64 --symbols-dir=/tmp/my_symbols/ --binary=out/android_arm/lib.unstripped/libchrome.so --clear --verbose
 ```
 
-If you have the crash information from logcat:
+如果您有来自 logcat 的崩溃信息：
+
 ```
 out/lnx64/microdump_stackwalk -s /tmp/dump.dmp /tmp/my_symbols/
 ```
 
-If you have the crash information in a tombstone:
+如果您在墓碑中有崩溃信息：
+
 ```
 ./third_party/android_ndk/ndk-stack -sym out/android_x86/lib.unstripped -dump tombstone
 ```
 
-### Remote debugging
+### 远程调试
 
-You can use Google Chrome to debug using the devtools console.
+您可以使用 Google Chrome 使用 devtools 控制台进行调试。
 
-In case the devtools console doesn't work (error 404),  the solution is to use chrome://inspect (Inspect fallback)
-or change SHA1 in build/util/LASTCHANGE
+如果 devtools 控制台不起作用（错误 404），解决方案是使用 chrome://inspect（检查后备）或在 build/util/LASTCHANGE 中更改 SHA1
 
 ```
 LASTCHANGE=8920e690dd011895672947112477d10d5c8afb09-refs/branch-heads/3497@{#948}
 ```
 
-and confirm the change using:
+并使用以下命令确认更改：
 
 ```
 rm out/android_arm/gen/components/version_info/version_info_values.h out/android_x86/gen/components/version_info/version_info_values.h out/android_arm/gen/build/util/webkit_version.h out/android_x86/gen/build/util/webkit_version.h out/android_arm/gen/chrome/common/chrome_version.h out/android_x86/gen/chrome/common/chrome_version.h
 ```
 
-### Optimizing binary size
+### 优化二进制大小
 
-If you want to optimize of the final APK, you can look at the size of each individual component using command:
+如果要优化最终 APK，可以使用以下命令查看每个单独组件的大小：
 
 ```
 ./tools/binary_size/supersize archive chrome.size --apk-file out/android_arm/apks/ChromePublic.apk -v
 ./tools/binary_size/supersize html_report chrome.size --report-dir size-report -v
 ```
 
-## Precompiled binaries
+## 预编译的二进制文件
 
-<a href="https://play.google.com/store/apps/details?id=com.kiwibrowser.browser"> <img src="https://camo.githubusercontent.com/59c5c810fc8363f8488c3a36fc78f89990d13e99/68747470733a2f2f706c61792e676f6f676c652e636f6d2f696e746c2f656e5f75732f6261646765732f696d616765732f67656e657269632f656e5f62616467655f7765625f67656e657269632e706e67" height="55">
+[![img](https://camo.githubusercontent.com/59c5c810fc8363f8488c3a36fc78f89990d13e99/68747470733a2f2f706c61792e676f6f676c652e636f6d2f696e746c2f656e5f75732f6261646765732f696d616765732f67656e657269632f656e5f62616467655f7765625f67656e657269632e706e67)](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser)
 
-## Business model
 
-The browser is getting paid by search engines for every search done using Kiwi Browser.
 
-Depending on the search engine choice, requests may go via Kiwibrowser / Kiwisearchservices servers.
-This is for invoicing our search partners and provide alternative search results (e.g. bangs aka "shortcuts").
+## 商业模式
 
-In some countries, the browser displays sponsored tiles or news on the homepage.
+使用 Kiwi 浏览器完成的每次搜索，搜索引擎都会为该浏览器付费。
 
-User data (browsing, navigation, passwords, accounts) is not collected because we have no interest to know what you do in the browser. Our main goal is to convince you to use a search engine partner, and this search engine makes money / new partnerships and shares revenue with us.
+根据搜索引擎的选择，请求可能会通过 Kiwibrowser / Kiwisearchservices 服务器。这是为了向我们的搜索合作伙伴开具发票并提供替代搜索结果（例如，刘海又名“快捷方式”）。
 
-## Roadmap
+在某些国家/地区，浏览器会在主页上显示赞助瓷砖或新闻。
 
-* During year 2020, the goal of the project is to make maintenance fixes and security updates.
+不会收集用户数据（浏览、导航、密码、帐户），因为我们没有兴趣知道您在浏览器中所做的事情。我们的主要目标是说服您使用搜索引擎合作伙伴，该搜索引擎可以赚钱/建立新的合作伙伴关系并与我们分享收入。
 
-If there is an issue or bug that you want to be included to Kiwi, please open an issue ticket pointing to the related Chromium bug or commit. Be precise, there are dozen of thousands of changes in Chromium.
+## 路线图
 
-* During 2021, Kiwi Browser will switch to a new branch called Kiwi Browser Next with a quite automated Chromium rebasing system.
+- 在 2020 年，该项目的目标是进行维护修复和安全更新。
 
-## Additional help
+如果您希望包含到 Kiwi 中的问题或错误，请打开指向相关 Chromium 错误或提交的问题票。准确地说，Chromium 有成千上万的变化。
 
-You can ask for extra help in our Discord server, or by [filing an issue](https://github.com/kiwibrowser/src/issues).
+- 在 2021 年期间，Kiwi Browser 将切换到一个名为 Kiwi Browser Next 的新分支，该分支具有相当自动化的 Chromium 变基系统。
 
-<a href="https://discord.gg/XyMppQq"> <img src="https://discordapp.com/assets/e4923594e694a21542a489471ecffa50.svg" height="50"></a>
+## 其他帮助
 
-Have fun with Kiwi!
+[您可以在我们的 Discord 服务器中寻求额外帮助，或](https://play.google.com/store/apps/details?id=com.kiwibrowser.browser)[提交问题](https://github.com/kiwibrowser/src/issues)。
 
-Arnaud.
+[![img](https://camo.githubusercontent.com/25c4223a3586b2138655b499bec582c88bae354eddd40290f3fa5a04b3ab62a1/68747470733a2f2f646973636f72646170702e636f6d2f6173736574732f65343932333539346536393461323135343261343839343731656366666135302e737667)](https://discord.gg/XyMppQq)
+
+和猕猴桃一起玩！
+
+阿尔诺。
